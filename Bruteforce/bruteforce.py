@@ -1,4 +1,5 @@
 import itertools
+from timeit import default_timer as timer
 
 # wczytanie danych
 data = []
@@ -10,6 +11,7 @@ with open("dane.txt") as f:
         singleData = [int(x) for x in f.readline().split()]
         data.append(singleData)
 
+startTime = timer()
 # lista miast ktora bedziemy permutowac
 way = []
 for i in range(1, nodesNumber):
@@ -22,13 +24,11 @@ allPosibilities = list(itertools.permutations(way, nodesNumber-1))
 minCost = int(50000)
 
 for i in range(len(allPosibilities)):  # <- sprawdzam po kolei permutacje
-    # dodanie wezla 0 na poczatku i na koncu kazdej sciezki:
-    singlePossibility = list(allPosibilities[i])
-    singlePossibility.append(0)
-    singlePossibility.insert(0, 0)
-    allPosibilities[i] = singlePossibility
+    # doliczenie dojscia z 0 do kolejnego wezla na poczatku i na koncu z ostatniego do 0
+    begin = data[0][allPosibilities[i][0]]
+    end = data[len(allPosibilities[i])][0]
 
-    singleCost = int(0)
+    singleCost = int(begin + end)
     # sprawdzam koszt jednej sciezki
     for j in range(len(allPosibilities[i])-1):
         singleCost += (data[allPosibilities[i][j]][allPosibilities[i][j+1]])
@@ -36,4 +36,6 @@ for i in range(len(allPosibilities)):  # <- sprawdzam po kolei permutacje
     if (singleCost < minCost):
         minCost = singleCost
 
+endTime = timer()
 print("Min cost: " + str(minCost))
+print(endTime-startTime)
