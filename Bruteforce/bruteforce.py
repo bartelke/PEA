@@ -6,13 +6,17 @@ iniFile = open("configuration.ini")
 
 a = True
 
+path = ""
 loops = int(iniFile.readline())
 while a:
+    if not path:
+        a = False
+
     path = iniFile.readline()
     print(path)
     data = []
     with open(path) as f:
-        # wczytanie ilosci wezlow (miast)
+        # wczytanie ilosci wiezlow (nodesNumber) oraz macierzy sasiedztwa(data):
         nodesNumber = int(f.readline())
 
         for i in range(nodesNumber+1):
@@ -23,18 +27,19 @@ while a:
     resultsFile.write(
         "\n\n#########################\nNUMBER OF NODES: "+str(nodesNumber)+"\n")
 
+    # lp - iterator zliczajacy ile razy przeprowadzilismy badania dla danego grafu
     for lp in range(loops):
 
         startTime = timer()
-        # lista miast ktora bedziemy permutowac
-        way = []
+        # lista wierzcholkow ktore bedziemy permutowac:
+        nodes = []
         for i in range(1, nodesNumber):
-            way.append(i)
+            nodes.append(i)
 
         # zbior wszystkich mozliwych sciezek (zbior wszystkich permutacji)
-        allPosibilities = list(itertools.permutations(way, nodesNumber-1))
+        allPosibilities = list(itertools.permutations(nodes, nodesNumber-1))
 
-        # algorytm:
+        # tu zaczyna sie algorytm:
         minCost = int(5000000)
 
         for i in range(len(allPosibilities)):  # <- sprawdzam po kolei permutacje
@@ -43,7 +48,7 @@ while a:
             end = data[len(allPosibilities[i])][0]
 
             singleCost = int(begin + end)
-            # sprawdzam koszt jednej sciezki
+            # petla obliczajaca koszt jednej sciezki
             for j in range(len(allPosibilities[i])-1):
                 singleCost += (data[allPosibilities[i][j]]
                                [allPosibilities[i][j+1]])
@@ -59,6 +64,3 @@ while a:
         resultsFile.write(string)
         print(loops)
         print(path)
-
-    if not path:
-        a = False
