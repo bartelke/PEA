@@ -16,6 +16,7 @@ def BnB(prev_mtx, prev_cost, nodesNumber, prev_node):
     toVisit = []
     costList = []
     local_min = 99999999
+    next_node = 0
 
     for i in range(1, nodesNumber):
         # stworzenie potomkow i obliczenie ich kosztu:
@@ -23,7 +24,7 @@ def BnB(prev_mtx, prev_cost, nodesNumber, prev_node):
             # lista potomkow:
             toVisit.append(i)
             # lista kosztow:
-            cost = prev_cost + prev_mtx[0][i]
+            cost = prev_cost + prev_mtx[prev_node][i]
             costList.append(cost)
             if cost < local_min:
                 local_min = cost
@@ -115,38 +116,12 @@ BnBresults = BnB(firstMTX, firstCost, nodesNumber, 0)
 matrixList.append(setRowsNColumns(BnBresults[2], 0, BnBresults[0]))
 print(matrixList[1])
 
+#######################################################
+# dane z BnB [kolejny, minimum, macierz]
+BnBresults2 = BnB(matrixList[1], BnBresults[1], nodesNumber, BnBresults[0])
 
-# print(toVisit)
-# print(costList)
-# print(local_min)
-# print(next_node)
+# odznacz miejsce:
+matrixList.append(setRowsNColumns(BnBresults2[2], 3, BnBresults2[0]))
+print(matrixList[2])
 
-# # wybranie wierzcholka next_node i stworzenie dla niego macierzy:
-# new_mtx = []
-# # zaznaczenie przejscia w macierzy
-# new_mtx = setRowsNColumns(prev_mtx, 0, next_node)
-# minimalize(new_mtx)
-# print(new_mtx)
-# local_min = 9999999
-# next_node = 0
-
-# toVisit2 = []
-# costList2 = []
-# for i in range(1, nodesNumber):
-#     prev_cost = 25
-
-#     # stworzenie potomkow i obliczenie ich kosztu:
-#     if new_mtx[3][i] != -1:
-#         # lista potomkow:
-#         toVisit2.append(i)
-#         # lista kosztow:
-#         cost = prev_cost + new_mtx[3][i]
-#         costList2.append(cost)
-#         if cost < local_min:
-#             local_min = cost
-#             next_node = i
-
-# print(toVisit2)
-# print(costList2)
-# print(local_min)
-# print(next_node)
+print(BnBresults2)
