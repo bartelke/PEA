@@ -115,6 +115,7 @@ firstCost = matrixList[0][1]
 index = 1
 matrixList.append(firstMTX)
 prevNode = 0
+prevMatrix = matrixList[1]
 cost = int(firstCost)
 globalMin = 999999999
 
@@ -124,11 +125,13 @@ cost_of_nodes = []
 way = [0]
 while len(way) < nodesNumber:
     # dane z BnB [kolejny, minimum, macierz, potomkowie, koszty_potomkow] (podaj: macierz poprzedniego wierzcholka, jego koszt, nodesNumber i ktory to wierzcholek)
-    BnBresults = BnB(matrixList[index], cost, nodesNumber, prevNode)
+    BnBresults = BnB(prevMatrix, cost, nodesNumber, prevNode)
+
+    prevMatrix = BnBresults[2]
 
     # odznacz miejsce:
-    matrixList.append(setRowsNColumns(
-        BnBresults[2], prevNode, BnBresults[0]))
+    matrixList.append(copy.deepcopy(setRowsNColumns(
+        BnBresults[2], prevNode, BnBresults[0])))
     prevNode = BnBresults[0]
 
     # BnBresults[0] - wierzcholek do ktorego przechodzimy
@@ -164,5 +167,9 @@ for i in range(len(nodes_to_visit)):
             j += 1
         j += 1
 
+for i in range(len(nodes_to_visit)):
+    for j in range(len(nodes_to_visit[i])):
+        print(matrixList[i+1])
+        print(cost_of_nodes[i][j])
+
 print(cost_of_nodes)
-print(nodes_to_visit)
