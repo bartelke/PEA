@@ -87,7 +87,7 @@ def minimalize(matrix):
 
 
 # wczytanie danych
-path = "hindutest.txt"
+path = "tsp_6_1.txt"
 data = []
 with open(path) as f:
     # wczytanie ilosci wiezlow (nodesNumber) oraz macierzy sasiedztwa(data):
@@ -163,7 +163,7 @@ for i in range(len(nodes_to_visit)):
         if node_cost >= globalMin:
             cost_of_nodes[i].remove(node_cost)
             node_num = nodes_to_visit[i][j]
-            nodes_to_visit[i].remove(j)
+            nodes_to_visit[i].remove(node_num)
             j += 1
         j += 1
 
@@ -172,10 +172,33 @@ print(cost_of_nodes)
 print(nodes_to_visit)
 for i in range(len(nodes_to_visit)):
     while len(nodes_to_visit[i]) != 0:
-        next_node = nodes_to_visit[i][0]
-        next_cost = cost_of_nodes[i][0]
+        way = [0]
+        prevNode = nodes_to_visit[i][0]
+        cost = cost_of_nodes[i][0]
+        prevMatrix = matrixList[i+1]
         #...........#
+        while len(way) < nodesNumber:
+            # dane z BnB [kolejny, minimum, macierz, potomkowie, koszty_potomkow] (podaj: macierz poprzedniego wierzcholka, jego koszt, nodesNumber i ktory to wierzcholek)
+            BnBresults = BnB(prevMatrix, cost, nodesNumber, prevNode)
+
+            prevMatrix = BnBresults[2]
+
+            # odznacz miejsce:
+            matrixList.append(copy.deepcopy(setRowsNColumns(
+                BnBresults[2], prevNode, BnBresults[0])))
+            prevNode = BnBresults[0]
+
+            # BnBresults[0] - wierzcholek do ktorego przechodzimy
+            # BnBresults[1] - jego koszt (tego wybranego czyli minimalna wartosc sposrod potomkow)
+
+            cost = BnBresults[1]
+            way.append(BnBresults[0])
+
+            index += 1
+
+        print(way)
+        print(cost)
         nodes_to_visit[i].remove(nodes_to_visit[i][0])
         cost_of_nodes[i].remove(cost_of_nodes[i][0])
-        print(cost_of_nodes)
-        print(nodes_to_visit)
+        # print(cost_of_nodes)
+        # print(nodes_to_visit)
