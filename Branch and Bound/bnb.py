@@ -167,9 +167,15 @@ for i in range(len(nodes_to_visit)):
             j += 1
         j += 1
 
-for i in range(len(nodes_to_visit)):
-    for j in range(len(nodes_to_visit[i])):
-        print(matrixList[i+1])
-        print(cost_of_nodes[i][j])
 
 print(cost_of_nodes)
+print(nodes_to_visit)
+for i in range(len(nodes_to_visit)):
+    while len(nodes_to_visit[i]) != 0:
+        next_node = nodes_to_visit[i][0]
+        next_cost = cost_of_nodes[i][0]
+        #...........#
+        nodes_to_visit[i].remove(nodes_to_visit[i][0])
+        cost_of_nodes[i].remove(cost_of_nodes[i][0])
+        print(cost_of_nodes)
+        print(nodes_to_visit)
