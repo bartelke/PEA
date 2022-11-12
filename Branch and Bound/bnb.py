@@ -31,7 +31,7 @@ def BnB(prev_mtx, prev_cost, nodesNumber, prev_node):
                 local_min = cost
                 next_node = i
 
-    results = [next_node, local_min, prev_mtx]
+    results = [next_node, local_min, prev_mtx, toVisit, costList]
     return results
 
 
@@ -116,11 +116,14 @@ index = 1
 matrixList.append(firstMTX)
 prevNode = 0
 cost = int(firstCost)
+globalMin = 999999999
 
+nodes_to_visit = []
+cost_of_nodes = []
 
 way = [0]
 while len(way) < nodesNumber:
-    # dane z BnB [kolejny, minimum, macierz] (podaj: macierz poprzedniego wierzcholka, jego koszt, nodesNumber i ktory to wierzcholek)
+    # dane z BnB [kolejny, minimum, macierz, potomkowie, koszty_potomkow] (podaj: macierz poprzedniego wierzcholka, jego koszt, nodesNumber i ktory to wierzcholek)
     BnBresults = BnB(matrixList[index], cost, nodesNumber, prevNode)
 
     # odznacz miejsce:
@@ -128,8 +131,38 @@ while len(way) < nodesNumber:
         BnBresults[2], prevNode, BnBresults[0]))
     prevNode = BnBresults[0]
 
+    # BnBresults[0] - wierzcholek do ktorego przechodzimy
+    # BnBresults[1] - jego koszt (tego wybranego czyli minimalna wartosc sposrod potomkow)
+
+    nodes_to_visit.append(BnBresults[3])
+    cost_of_nodes.append(BnBresults[4])
+
+    # usuniecie wybranego wierzcholka z listy potomkow:
+    nodes_to_visit[index-1].remove(BnBresults[0])
+    cost_of_nodes[index-1].remove(BnBresults[1])
+
     cost = BnBresults[1]
     way.append(BnBresults[0])
 
+    index += 1
+
 way.append(0)
 print(way)
+if globalMin > cost:
+    globalMin = cost
+
+# dotarlismy do liscia, pora usunac wezly ktore zostaly do zbadania a przekraczaja wartosc minimalna:
+for i in range(len(nodes_to_visit)):
+    j = 0
+
+    while j < len(nodes_to_visit[i]):
+        node_cost = cost_of_nodes[i][j]
+        if node_cost >= globalMin:
+            cost_of_nodes[i].remove(node_cost)
+            node_num = nodes_to_visit[i][j]
+            nodes_to_visit[i].remove(j)
+            j += 1
+        j += 1
+
+print(cost_of_nodes)
+print(nodes_to_visit)
