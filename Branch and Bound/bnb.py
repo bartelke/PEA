@@ -20,11 +20,12 @@ def BnB(prev_mtx, prev_cost, nodesNumber, prev_node):
 
     for i in range(1, nodesNumber):
         # stworzenie potomkow i obliczenie ich kosztu:
-        if prev_mtx[prev_node][i] != -1:
+        element = int(prev_mtx[prev_node][i])
+        if element != -1:
             # lista potomkow:
             toVisit.append(i)
             # lista kosztow:
-            cost = prev_cost + prev_mtx[prev_node][i]
+            cost = prev_cost + element
             costList.append(cost)
             if cost < local_min:
                 local_min = cost
@@ -109,19 +110,26 @@ matrixList.append(minimalize(copy.deepcopy(data)))
 firstMTX = matrixList[0][0]
 firstCost = matrixList[0][1]
 
-# dane z BnB [kolejny, minimum, macierz]
-BnBresults = BnB(firstMTX, firstCost, nodesNumber, 0)
-
-# odznacz miejsce:
-matrixList.append(setRowsNColumns(BnBresults[2], 0, BnBresults[0]))
-print(matrixList[1])
-
 #######################################################
-# dane z BnB [kolejny, minimum, macierz]
-BnBresults2 = BnB(matrixList[1], BnBresults[1], nodesNumber, BnBresults[0])
+# uwaga!!! element o indeksie 0 ma inny typ niz pozostale na matrixList dlatego zaczynamy od 1
+index = 1
+matrixList.append(firstMTX)
+prevNode = 0
+cost = int(firstCost)
 
-# odznacz miejsce:
-matrixList.append(setRowsNColumns(BnBresults2[2], 3, BnBresults2[0]))
-print(matrixList[2])
 
-print(BnBresults2)
+way = [0]
+while len(way) < nodesNumber:
+    # dane z BnB [kolejny, minimum, macierz] (podaj: macierz poprzedniego wierzcholka, jego koszt, nodesNumber i ktory to wierzcholek)
+    BnBresults = BnB(matrixList[index], cost, nodesNumber, prevNode)
+
+    # odznacz miejsce:
+    matrixList.append(setRowsNColumns(
+        BnBresults[2], prevNode, BnBresults[0]))
+    prevNode = BnBresults[0]
+
+    cost = BnBresults[1]
+    way.append(BnBresults[0])
+
+way.append(0)
+print(way)
