@@ -1,4 +1,5 @@
 import math
+from timeit import default_timer as timer
 
 
 def getMinimums(data, i):
@@ -91,23 +92,50 @@ def BnB(data):
     rushToLeaf(data, bound, 0, 1, currWay, visitedNodes)
 
 
+# wczytanie danych
+iniFile = open("configuration.ini")
+
+a = True
+
+path = ""
 maxsize = 999999999999
-path = "tsp_12.txt"
-data = []
-with open(path) as f:
-    # wczytanie ilosci wiezlow (nodesNumber) oraz macierzy sasiedztwa(data):
-    N = int(f.readline())
+path = ""
+loops = int(iniFile.readline())
+while a:
+    if not path:
+        a = False
 
-    for i in range(N):
-        singleData = [int(x) for x in f.readline().split()]
-        data.append(singleData)
+    path = iniFile.readline()
+    print(path)
+    data = []
+    with open(path) as f:
+        # wczytanie ilosci wiezlow (nodesNumber) oraz macierzy sasiedztwa(data):
+        N = int(f.readline())
 
-final_way = []
-visitedNodes = [False] * N
-finalCost = maxsize
+        for i in range(N + 1):
+            singleData = [int(x) for x in f.readline().split()]
+            data.append(singleData)
 
-BnB(data)
+    resultsFile = open("results.txt", "a")
+    resultsFile.write(
+        "\n\n#########################\nNUMBER OF NODES: "+str(N)+"\n")
+    # lp - iterator zliczajacy ile razy przeprowadzilismy badania dla danego grafu
+    for lp in range(loops):
+        startTime = timer()
 
-print("Koszt: ", finalCost)
-print("Sciezka: ", end=' ')
-print(final_way)
+        final_way = []
+        visitedNodes = [False] * N
+        finalCost = maxsize
+
+        BnB(data)
+
+        print("Koszt: ", finalCost)
+        print("Sciezka: ", end=' ')
+        print(final_way)
+        endTime = timer()
+        print(endTime-startTime)
+        string = str("\nTime no." + str(lp) + ":     " +
+                     str(endTime-startTime)+"  [s]")
+        resultsFile.write(string)
+        print(loops)
+        print(path)
