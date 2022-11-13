@@ -97,6 +97,7 @@ with open(path) as f:
         singleData = [int(x) for x in f.readline().split()]
         data.append(singleData)
 
+print(data)
 # zmiana 0 na -1 do obliczen:
 for i in range(nodesNumber):
     for j in range(nodesNumber):
