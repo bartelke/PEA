@@ -31,10 +31,11 @@ def rushToLeaf(data, bound, actualCost, deepthLevel, currWay, visitedNodes):
             boundCopy = bound
             actualCost += data[currWay[deepthLevel - 1]][i]
 
-            # obliczanie ograniczenia:
+            # obliczanie ograniczenia dla pierwszego poziomu:
             if deepthLevel == 1:
                 bound -= ((getMinimums(data,
                           currWay[deepthLevel - 1])[0] + getMinimums(data, i)[0])/2)
+            # ograniczenie dla kolejnych poziomow:
             else:
                 secondMin = getMinimums(data, currWay[deepthLevel - 1])[1]
                 firstMin = getMinimums(data, i)[0]
@@ -43,7 +44,7 @@ def rushToLeaf(data, bound, actualCost, deepthLevel, currWay, visitedNodes):
             # sprawdzenie czy powinnismy isc glebiej tym kierunkiem:
             if bound + actualCost < finalCost:
                 # jesli tak to ustawiamy sprawdzany wezel na odwiedzony i dodajemy go do aktualnej sciezki
-                # a nastepnie rekurencyjnie idziemy glebiej az do liscia:
+                # a nastepnie rekurencyjnie idziemy glebiej:
                 visitedNodes[i] = True
                 currWay[deepthLevel] = i
 
@@ -83,7 +84,7 @@ def BnB(data):
     visitedNodes = [False] * N
     visitedNodes[0] = True
 
-    # granica:
+    # poczatkowa wartosc ograniczenia:
     bound = 0
     for i in range(N):
         bound += (getMinimums(data, i)[0] + getMinimums(data, i)[1])
@@ -123,6 +124,7 @@ while a:
     for lp in range(loops):
         startTime = timer()
 
+        # ustawianie wartosci poczatkowych
         final_way = []
         visitedNodes = [False] * N
         finalCost = maxsize
