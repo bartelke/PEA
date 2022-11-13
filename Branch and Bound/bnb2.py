@@ -1,7 +1,5 @@
 import math
 
-# funkcje do obliczania najmniejszej i drugiej najmniejszej wartosci wpadajacej do danego wezla:
-
 
 def getMinimums(data, i):
     firstMinVal = maxsize
