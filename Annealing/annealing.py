@@ -1,31 +1,29 @@
-
 # "@author of external package: Michael Ritter. Need to pip install this package"
 import tsplib95
 import random
 import math
 import time
 import copy
-import matplotlib.pyplot as plt
 
 # Change tsp file name to run on separate tsp datasets
-data = tsplib95.load('br17.atsp')
+data = tsplib95.load('gr17.tsp')
 cities = list(data.get_nodes())
 
 
-def annealing(initial_state):
+def annealing(initial_state, end_temp, initial_temp, temp_change):
     """Peforms simulated annealing to find a solution"""
-    initial_temp = 5000
 
-    alpha = 0.99
+    alpha = 1 - temp_change
 
     current_temp = initial_temp
+    #print("TEMP: ", current_temp)
 
     # Start by initializing the current state with the initial state
     solution = initial_state
     same_solution = 0
     same_cost_diff = 0
 
-    while same_solution < 1500 and same_cost_diff < 150000:
+    while current_temp > end_temp:
         neighbor = get_neighbors(solution)
 
         # Check if neighbor is best so far
@@ -51,8 +49,8 @@ def annealing(initial_state):
                 same_cost_diff += 1
         # decrement the temperature
         current_temp = current_temp*alpha
-        print(1/get_cost(solution), same_solution)
-    print(1/get_cost(solution))
+        #print(1/get_cost(solution), same_solution)
+    # print(1/get_cost(solution))
 
     return solution, 1/get_cost(solution)
 
@@ -142,20 +140,18 @@ def swap_routes(state):
 best_route_distance = []
 best_route = []
 convergence_time = []
-for i in range(10):
+for i in range(1):
+    # zmienne parametryzowane:
+    initial_temp = 10000
+    end_temp = 0.0001
+    temp_change = 0.001
+
     start = time.time()
-    route, route_distance = annealing(cities)
+    route, route_distance = annealing(
+        cities, end_temp, initial_temp, temp_change)
     time_elapsed = time.time() - start
     best_route_distance.append(route_distance)
     best_route.append(route)
     convergence_time.append(time_elapsed)
 
-    # Plot Routes
-    xs = [data.node_coords[i][0] for i in route]
-    ys = [data.node_coords[i][1] for i in route]
-
-    plt.clf()
-    # 'bo-' means blue color, round points, solid lines
-    plt.plot(xs, ys, 'y--')
-    plt.xlabel('X Coordinates')
-    plt.ylabel('Y Coordinates')
+    print(best_route_distance)
