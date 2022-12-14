@@ -5,10 +5,6 @@ import math
 import time
 import copy
 
-# Change tsp file name to run on separate tsp datasets
-data = tsplib95.load('gr17.tsp')
-cities = list(data.get_nodes())
-
 
 def annealing(initial_state, end_temp, initial_temp, temp_change):
     """Peforms simulated annealing to find a solution"""
@@ -137,14 +133,27 @@ def swap_routes(state):
     return state
 
 
+###########################################################
+# MAIN:
 best_route_distance = []
 best_route = []
 convergence_time = []
-for i in range(1):
-    # zmienne parametryzowane:
-    initial_temp = 10000
-    end_temp = 0.0001
-    temp_change = 0.001
+
+# wczytanie danych
+iniFile = open("configuration.ini")
+path = ""
+loops = int(iniFile.readline())
+initial_temp = float(iniFile.readline())
+temp_change = float(iniFile.readline())
+end_temp = float(iniFile.readline())
+path = iniFile.readline()
+
+# wczytanie plikow z tsplib
+data = tsplib95.load(path)
+cities = list(data.get_nodes())
+
+for i in range(loops):
+    # pojedyncze wykonanie algorytmu:
 
     start = time.time()
     route, route_distance = annealing(
