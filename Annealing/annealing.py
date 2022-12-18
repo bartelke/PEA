@@ -1,18 +1,16 @@
-# "@author of external package: Michael Ritter. Need to pip install this package"
 import tsplib95
-import random
-import math
 import time
 import copy
+import random
+import math
+
+# wyzarzanie:
 
 
 def annealing(initial_state, end_temp, initial_temp, temp_change):
-    """Peforms simulated annealing to find a solution"""
-
     alpha = 1 - temp_change
 
     current_temp = initial_temp
-    #print("TEMP: ", current_temp)
 
     # Start by initializing the current state with the initial state
     solution = initial_state
@@ -22,9 +20,8 @@ def annealing(initial_state, end_temp, initial_temp, temp_change):
     while current_temp > end_temp:
         neighbor = get_neighbors(solution)
 
-        # Check if neighbor is best so far
+        # Oblicz roznice i sprawdz czy poprzednio znalezione rozwiazanie jest gorsze niz aktualne
         cost_diff = get_cost(neighbor) - get_cost(solution)
-        # if the new solution is better, accept it
         if cost_diff > 0:
             solution = neighbor
             same_solution = 0
@@ -34,7 +31,7 @@ def annealing(initial_state, end_temp, initial_temp, temp_change):
             solution = neighbor
             same_solution = 0
             same_cost_diff += 1
-        # if the new solution is not better, accept it with a probability of e^(-cost/temp)
+        # jesli nowe rozwiazanie jest gorsze to zaakceptuj je z prawdopodobienstwem e^(-cost/temp)
         else:
             if random.uniform(0, 1) <= math.exp(float(cost_diff) / float(current_temp)):
                 solution = neighbor
@@ -43,7 +40,8 @@ def annealing(initial_state, end_temp, initial_temp, temp_change):
             else:
                 same_solution += 1
                 same_cost_diff += 1
-        # decrement the temperature
+
+        # chlodzenie
         current_temp = current_temp*alpha
         #print(1/get_cost(solution), same_solution)
     # print(1/get_cost(solution))
@@ -150,17 +148,21 @@ path = iniFile.readline()
 
 # wczytanie plikow z tsplib
 data = tsplib95.load(path)
-cities = list(data.get_nodes())
+first_route = list(data.get_nodes())
+
+# losowe poczatkowe rozwiazanie:
+random.shuffle(first_route)
 
 for i in range(loops):
     # pojedyncze wykonanie algorytmu:
-
     start = time.time()
     route, route_distance = annealing(
-        cities, end_temp, initial_temp, temp_change)
+        first_route, end_temp, initial_temp, temp_change)
     time_elapsed = time.time() - start
     best_route_distance.append(route_distance)
     best_route.append(route)
     convergence_time.append(time_elapsed)
 
     print(best_route_distance)
+    print(best_route)
+    print(convergence_time)
