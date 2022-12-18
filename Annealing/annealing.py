@@ -7,7 +7,7 @@ import math
 # wyzarzanie:
 
 
-def annealing(initial_state, end_temp, initial_temp, temp_change):
+def annealing(initial_state, end_temp, initial_temp, temp_change, L):
     alpha = 1 - temp_change
 
     current_temp = initial_temp
@@ -16,33 +16,32 @@ def annealing(initial_state, end_temp, initial_temp, temp_change):
     same_cost_diff = 0
 
     while current_temp > end_temp:
-        neighbor = get_neighbors(solution)
+        for i in range(L):
+            neighbor = get_neighbors(solution)
 
-        # Oblicz roznice i sprawdz czy poprzednio znalezione rozwiazanie jest gorsze niz aktualne
-        cost_diff = get_cost(neighbor) - get_cost(solution)
-        if cost_diff > 0:
-            solution = neighbor
-            same_solution = 0
-            same_cost_diff = 0
-
-        elif cost_diff == 0:
-            solution = neighbor
-            same_solution = 0
-            same_cost_diff += 1
-        # jesli nowe rozwiazanie jest gorsze to zaakceptuj je z prawdopodobienstwem e^(-cost/temp)
-        else:
-            if random.uniform(0, 1) <= math.exp(float(cost_diff) / float(current_temp)):
+            # Oblicz roznice i sprawdz czy poprzednio znalezione rozwiazanie jest gorsze niz aktualne
+            cost_diff = get_cost(neighbor) - get_cost(solution)
+            if cost_diff > 0:
                 solution = neighbor
                 same_solution = 0
                 same_cost_diff = 0
-            else:
-                same_solution += 1
-                same_cost_diff += 1
 
-        # chlodzenie
-        current_temp = current_temp*alpha
-        #print(1/get_cost(solution), same_solution)
-    # print(1/get_cost(solution))
+            elif cost_diff == 0:
+                solution = neighbor
+                same_solution = 0
+                same_cost_diff += 1
+            # jesli nowe rozwiazanie jest gorsze to zaakceptuj je z prawdopodobienstwem e^(-cost/temp)
+            else:
+                if random.uniform(0, 1) <= math.exp(float(cost_diff) / float(current_temp)):
+                    solution = neighbor
+                    same_solution = 0
+                    same_cost_diff = 0
+                else:
+                    same_solution += 1
+                    same_cost_diff += 1
+
+            # chlodzenie
+            current_temp = current_temp*alpha
 
     return solution, 1/get_cost(solution)
 
@@ -94,6 +93,7 @@ loops = int(iniFile.readline())
 initial_temp = float(iniFile.readline())
 temp_change = float(iniFile.readline())
 end_temp = float(iniFile.readline())
+L = int(iniFile.readline())
 path = iniFile.readline()
 
 # wczytanie plikow z tsplib
@@ -110,7 +110,7 @@ for i in range(loops):
     # pojedyncze wykonanie algorytmu:
     start = time.time()
     route, route_distance = annealing(
-        first_route, end_temp, initial_temp, temp_change)
+        first_route, end_temp, initial_temp, temp_change, L)
     time_elapsed = time.time() - start
     best_route_distance.append(route_distance)
     best_route.append(route)
@@ -122,4 +122,4 @@ for i in range(loops):
 
     # zapis wynikow do pliku:
     resultsFile.write(str(path) + ", " + str(route_distance) + ", " + str(time_elapsed) + ", " +
-                      str(initial_temp) + ", " + str(temp_change)+"\n")
+                      str(initial_temp) + ", " + str(temp_change) + ", " + str(L) + "\n")
