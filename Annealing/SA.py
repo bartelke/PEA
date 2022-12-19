@@ -22,11 +22,11 @@ def loadGraph(file):
 def simulatedAnnealing():
     global vertices
     global alpha
-    global T_max
-    global T_end
-    global numEras
+    global T_start
+    global T_stop
+    global L
 
-    currTemp = float(T_max)
+    currTemp = float(T_start)
     initPath = (numpy.array(vertices))
     random.shuffle(initPath)
     result = initPath.tolist()
@@ -34,8 +34,8 @@ def simulatedAnnealing():
     sameCost = 0
     acctepedWorse = 0
 
-    while ((currTemp > T_end) and (sameCost < 15000) and (acctepedWorse < 15000)):
-        for i in range(1, numEras + 1):
+    while ((currTemp > T_stop) and (sameCost < 15000) and (acctepedWorse < 15000)):
+        for i in range(1, L + 1):
             neighbour = findNeighbour(result)
             resultCost = getCost(result)
             neighbourCost = getCost(neighbour)
@@ -111,10 +111,11 @@ if __name__ == "__main__":
     iterations = 0
 
     alpha = 0
-    T_max = 0
-    T_end = 0
-    numEras = 0
-    tspFile = ""
+    T_start = 0
+    T_stop = 0
+    L = 0
+    pathToFile = ""
+    # wczytywanie danych:
     with open("config.ini") as configFile:
         for line in configFile:
             pass
@@ -123,21 +124,34 @@ if __name__ == "__main__":
     with open("config.ini") as configFile:
         for line in configFile:
             line = line.split(' ')
-            if (len(line) < 4):
+            if (len(line) < 5):
+                print("zly plik ini")
                 break
 
-            tspFile = line[0]
+            pathToFile = line[0]
             iterations = int(line[1])
-            T_max = float(line[2])
-            T_end = float(line[3])
-            numEras = int(line[4])
+            T_start = float(line[2])
+            T_stop = float(line[3])
+            L = int(line[4])
             alpha = float(line[5])
-            loadGraph(tspFile)
+            trueResult = int(line[6])
+
+            loadGraph(pathToFile)
+
+           # pomiary:
             startTime = time.time()
-            resultPath, result = simulatedAnnealing()
+            resultRoute, result = simulatedAnnealing()
             endTime = time.time()
+            totalTime = endTime - startTime
+
             print("cost ", result)
-            print('path ', resultPath)
-            print('time ', endTime - startTime)
-            print('memory', psutil.Process(
-                os.getpid()).memory_info().rss / 1024 ** 2)
+            print('path ', resultRoute)
+            print('time ', totalTime)
+            differencePertentage = str(
+                abs(trueResult-result)*100/trueResult) + "%"
+
+            # zapis wynikow do pliku:
+            resultsFile = open("results.csv", "a")
+            resultsFile.write("\n\n")
+            resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
+                              str(T_start) + ", " + str(alpha) + ", " + str(L) + ", " + differencePertentage + "\n")
