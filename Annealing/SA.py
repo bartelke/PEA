@@ -1,63 +1,55 @@
-import sys
 import tsplib95
-from itertools import permutations
-from itertools import combinations
-from numpy import random
 import numpy
 import random
 import copy
 import time
-import os
-import psutil
 import math
 
 
-def loadGraph(file):
-    global vertices
-    global matrix
-    matrix = tsplib95.load(file)
-    vertices = list(matrix.get_nodes())
-
-
 def simulatedAnnealing():
-    global vertices
-    global alpha
+    global nodes
     global T_start
     global T_stop
     global L
+    global alpha
 
     currTemp = float(T_start)
-    initPath = (numpy.array(vertices))
+    initPath = (numpy.array(nodes))
     random.shuffle(initPath)
     result = initPath.tolist()
 
     sameCost = 0
-    acctepedWorse = 0
+    numOfWorseAcc = 0
 
-    while ((currTemp > T_stop) and (sameCost < 15000) and (acctepedWorse < 15000)):
+    while ((currTemp > T_stop) and (sameCost < 15000) and (numOfWorseAcc < 15000)):
+        # L = dlugosc epoki
         for i in range(1, L + 1):
             neighbour = findNeighbour(result)
             resultCost = getCost(result)
             neighbourCost = getCost(neighbour)
-            costDifference = neighbourCost - resultCost
+            diff = neighbourCost - resultCost
             if (neighbourCost < resultCost):
+                # przyjęcie lepszego wyniku
                 result = neighbour
                 sameCost = 0
-                acctepedWorse = 0
+                numOfWorseAcc = 0
             else:
+                # prawdopodobieństwo do przyjęcia gorszego wyniku
                 s = random.random()
-                p = math.exp(((-1 * float(costDifference)) / float(currTemp)))
+                p = math.exp(((-1 * float(diff)) / float(currTemp)))
                 if (s < p):
-                    if (costDifference == 0):
+                    if (diff == 0):
                         result = neighbour
                         sameCost += 1
-                        acctepedWorse = 0
+                        numOfWorseAcc = 0
 
                     else:
+                        # przyjecie gorszego wyniku
                         result = neighbour
                         sameCost = 0
-                        acctepedWorse += 1
+                        numOfWorseAcc += 1
 
+            # chłodzenie
             currTemp = (alpha ** i) * currTemp
 
     return result, getCost(result)
@@ -69,6 +61,7 @@ def findNeighbour(path):
     return neighbour
 
 
+# 2-zamiana:
 def two_opt(path):
     pathLength = len(path)
     v1 = random.choice(path)
@@ -104,22 +97,27 @@ def getCost(path):
     return cost
 
 
-if __name__ == "__main__":
-    nodesNumber = 0
-    csvFile = ""
-    matrix = 0
-    iterations = 0
+def loadData(file):
+    global nodes
+    global matrix
+    matrix = tsplib95.load(file)
+    nodes = list(matrix.get_nodes())
 
-    alpha = 0
-    T_start = 0
-    T_stop = 0
-    L = 0
-    pathToFile = ""
-    # wczytywanie danych:
-    with open("config.ini") as configFile:
-        for line in configFile:
-            pass
-        csvFile = line
+
+############################################
+# MAIN:
+matrix = 0
+loops = 0
+
+alpha = 0
+T_start = 0
+T_stop = 0
+L = 0
+pathToFile = ""
+# wczytywanie danych:
+with open("config.ini") as configFile:
+    for line in configFile:
+        pass
 
     with open("config.ini") as configFile:
         for line in configFile:
@@ -129,29 +127,30 @@ if __name__ == "__main__":
                 break
 
             pathToFile = line[0]
-            iterations = int(line[1])
+            loops = int(line[1])
             T_start = float(line[2])
             T_stop = float(line[3])
             L = int(line[4])
             alpha = float(line[5])
             trueResult = int(line[6])
 
-            loadGraph(pathToFile)
+            loadData(pathToFile)
 
            # pomiary:
             startTime = time.time()
             resultRoute, result = simulatedAnnealing()
             endTime = time.time()
-            totalTime = endTime - startTime
+            totalTime = round(endTime - startTime, 3)
 
             print("cost ", result)
             print('path ', resultRoute)
             print('time ', totalTime)
-            differencePertentage = str(
-                abs(trueResult-result)*100/trueResult) + "%"
+            differencePertentage = round(
+                abs(trueResult-result)*100/trueResult, 2)
+            print(str(differencePertentage) + "% ")
 
-            # zapis wynikow do pliku:
-            resultsFile = open("results.csv", "a")
-            resultsFile.write("\n\n")
-            resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
-                              str(T_start) + ", " + str(alpha) + ", " + str(L) + ", " + differencePertentage + "\n")
+        # zapis wynikow do pliku:
+        resultsFile = open("results.csv", "a")
+        resultsFile.write("\n\n")
+        resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
+                          str(T_start) + ", " + str(alpha) + ", " + str(L) + ", " + str(differencePertentage) + "% \n")
