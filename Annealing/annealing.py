@@ -41,7 +41,7 @@ def annealing(initial_state, end_temp, initial_temp, temp_change, L):
                     same_cost_diff += 1
 
             # chlodzenie
-            current_temp = current_temp*alpha
+            current_temp = current_temp*(alpha**i)
 
     return solution, 1/get_cost(solution)
 
