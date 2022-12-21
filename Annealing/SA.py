@@ -12,6 +12,7 @@ def simulatedAnnealing():
     global T_stop
     global L
     global alpha
+    global coolingMethod
 
     currTemp = float(T_start)
     initPath = (numpy.array(nodes))
@@ -50,7 +51,12 @@ def simulatedAnnealing():
                         numOfWorseAcc += 1
 
             # chłodzenie
-            currTemp = (alpha ** i) * currTemp
+            if coolingMethod == 0:
+                # schemat geometryczny
+                currTemp = (alpha ** i) * currTemp
+            else:
+                # schemat logarytmiczny (Boltzmana)
+                currTemp = currTemp/(0.0001+alpha*math.log(1+i, math.e))
 
     return result, getCost(result)
 
@@ -114,6 +120,12 @@ T_start = 0
 T_stop = 0
 L = 0
 pathToFile = ""
+coolingMethod = 0
+
+# coolingMthod = sposób chłodzenia
+# 0 - geometryczny
+# 1 - logarytmiczny
+
 # wczytywanie danych:
 with open("config.ini") as configFile:
     for line in configFile:
@@ -122,7 +134,7 @@ with open("config.ini") as configFile:
     with open("config.ini") as configFile:
         for line in configFile:
             line = line.split(' ')
-            if (len(line) < 5):
+            if (len(line) < 6):
                 print("zly plik ini")
                 break
 
@@ -133,6 +145,7 @@ with open("config.ini") as configFile:
             L = int(line[4])
             alpha = float(line[5])
             trueResult = int(line[6])
+            coolingMethod = int(line[7])
 
             loadData(pathToFile)
 
