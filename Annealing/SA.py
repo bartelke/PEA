@@ -149,8 +149,8 @@ with open("config.ini") as configFile:
                 abs(trueResult-result)*100/trueResult, 2)
             print(str(differencePertentage) + "% ")
 
-        # zapis wynikow do pliku:
-        resultsFile = open("results.csv", "a")
-        resultsFile.write("\n\n")
-        resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
-                          str(T_start) + ", " + str(alpha) + ", " + str(L) + ", " + str(differencePertentage) + "% \n")
+            # zapis wynikow do pliku:
+            resultsFile = open("results.csv", "a")
+            resultsFile.write("\n\n")
+            resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
+                              str(T_start) + ", " + str(alpha) + ", " + str(L) + ", " + str(differencePertentage) + "% \n")
