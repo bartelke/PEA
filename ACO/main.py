@@ -1,4 +1,6 @@
 import math
+import numpy
+import networkx
 
 from aco import ACO, Graph
 import tsplib95
@@ -7,8 +9,14 @@ import tsplib95
 def loadData(file):
     global nodes
     global matrix
-    matrix = tsplib95.load(file)
-    nodes = len(list(matrix.get_nodes()))
+    global cities
+
+    problemFile = tsplib95.load(file)
+    graph = problemFile.get_graph()
+    weight = networkx.to_numpy_array(graph)
+    cities = list(problemFile.get_nodes())
+    matrix = weight.tolist()
+    print(matrix)
 
 
 ################################################################
@@ -16,6 +24,7 @@ def loadData(file):
 matrix = 0
 cities = []
 points = []
+nodes = 0
 
 # wczytywanie danych:
 with open("config.ini") as configFile:
@@ -40,17 +49,11 @@ with open("config.ini") as configFile:
 
             loadData(pathToFile)
 
+
+rank = len(cities)
+
 print(matrix)
-
-with open('./data/chn31.txt') as f:
-    for line in f.readlines():
-        city = line.split(' ')
-        cities.append(
-            dict(index=int(city[0]), x=int(city[1]), y=int(city[2])))
-        points.append((int(city[1]), int(city[2])))
-cost_matrix = []
-
 aco = ACO(10, 100, 1.0, 10.0, 0.5, 10, 2)
-graph = Graph(matrix, nodes)
+graph = Graph(matrix, rank)
 path, cost = aco.solve(graph)
 print('cost: {}, path: {}'.format(cost, path))
