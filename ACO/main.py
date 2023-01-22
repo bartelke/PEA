@@ -170,26 +170,27 @@ with open("config.ini") as configFile:
             trueResult = int(line[4])
             pheromoneType = int(line[5])
 
-            print(alpha)
 
             loadData(pathToFile)
 
 
-rank = len(cities)
+            rank = len(cities)
+            print(rank)
 
-# ant_count: int, generations: int, alpha: float, beta: float, rho: float, q: int, strategy: int
-startTime = time.time()
-aco = ACO(10, 100, alpha, betha, 0.5, 10, pheromoneType)
-graph = Graph(matrix, rank)
-path, result = aco.solve(graph)
-print(result)
-differencePertentage = round(abs(trueResult-result)*100/trueResult, 2)
-endTime = time.time()
-totalTime = round(endTime - startTime, 3)
-print(str(differencePertentage) + "% ")
 
-# zapis wynikow do pliku:
-resultsFile = open("results.csv", "a")
-resultsFile.write("\n\n")
-resultsFile.write(str(pathToFile) + ", " + str(result) + ", " + str(totalTime) + ", " +
-                              str(startTime) + ", " + str(differencePertentage) + "% \n")
+            # ant_count: int, generations: int, alpha: float, beta: float, rho: float, q: int, strategy: int
+            startTime = time.time()
+            aco = ACO(rank, 10, alpha, betha, 0.5, 10, pheromoneType)
+            graph = Graph(matrix, rank)
+            path, result = aco.solve(graph)
+            print(result)
+            differencePertentage = round(abs(trueResult-result)*100/trueResult, 2)
+            endTime = time.time()
+            totalTime = round(endTime - startTime, 3)
+            print(str(differencePertentage) + "% ")
+
+            # zapis wynikow do pliku:
+            resultsFile = open("results.csv", "a")
+            resultsFile.write("\n\n")
+            resultsFile.write(str(pathToFile) + ", " + str(result) + ", " +
+                            str(round(totalTime, 2)) + ", " + str(differencePertentage) + "% \n")
